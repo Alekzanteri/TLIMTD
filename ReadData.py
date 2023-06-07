@@ -3,6 +3,7 @@ import mtpy.core.z as mtz
 import os
 import numpy as np
 import pandas as pd
+import glob
 
 class ReadData:
     """ This class contains tools for reading data to mtpy using dataformats that doesn't work with mtpy normally.
@@ -68,13 +69,13 @@ class ReadData:
                 print(f'{mt_obj.station} is now converted to mtpy object. No edi saved')
 
     
-    def mtf(file, save_edi, savepath=None):
+    def mtf(file, save_edi, savepath=None, encoding='utf8'):
         """
         This function reads mtf file and converts it to mtpy object. AH 06/2023
         """
   
         lines=[] #With function opens the file and reads the file line by line to a list.
-        with open(file, encoding='utf8') as f:
+        with open(file, encoding=encoding) as f:
             for line in f:
                 lines.append(line.strip())
         imp=pd.DataFrame(columns=['T,s', 'ROT', 'ReXX', 'ImXX', '|XX|_err', 'ReXY', 'ImXY', '|XY|_err', 'ReYX', 'ImYX', '|YX|_err',
@@ -122,25 +123,27 @@ class ReadData:
         return(mt_obj.mtpy)
     
     
-    def mtf_folder(folder, save_edi, savepath=None):
+    def mtf_folder(folder, save_edi, savepath=None, encoding='utf8'):
         """
         This function reads folder mtf files and converts them to mtpy objects. AH 06/2023
         """
-        mtf_files=[os.path.join(folder,ff) for ff in os.listdir(folder)]
+        mtf_files=glob.glob(folder+r'\*.mtf')
         mtpyObjects=[]
         for i in range (0, len(mtf_files)):
-            mtpyObjects.append(ReadData.mtf(mtf_files[i], save_edi, savepath))
+            mtpyObjects.append(ReadData.mtf(mtf_files[i], save_edi, savepath, encoding))
         return(mtpyObjects)
     
     
-    def ide(file, save_edi, savepath=None):
+    def ide(file, save_edi, savepath=None, encoding='utf8'):
         """
         This function reads ide file and converts it to mtpy object. AH 06/2023
         """
+        
         lines=[] #With function opens the file and reads the file line by line to a list.
-        with open(file, encoding='utf8') as f:
+        with open(file, encoding=encoding) as f:
             for line in f:
                 lines.append(line.strip())
+                
         imp=pd.DataFrame(columns=['freq', 'ROT', 'ReXX', 'ImXX', 'VAR_XX', 'ReXY', 'ImXY', 'VAR_XY', 'ReYX', 'ImYX', 'VAR_YX',
                                   'ReYY','ImYY','VAR_YY'])#imp values
         tip=pd.DataFrame(columns=['freq', 'ROT', 'ReXX', 'ImXX', 'VAR_XX', 'ReXY', 'ImXY', 'VAR_XY'])
@@ -170,12 +173,14 @@ class ReadData:
         return(mt_obj.mtpy)
     
     
-    def ide_folder(folder, save_edi, savepath):
+    def ide_folder(folder, save_edi, savepath=None, encoding='utf8'):
         """
         This function reads folder mtf files and converts them to mtpy objects. AH 06/2023
         """
-        ide_files=[os.path.join(folder,ff) for ff in os.listdir(folder)]
+        
+        ide_files=glob.glob(folder+r'\*.ide')
+        
         mtpyObjects=[]
         for i in range (0, len(ide_files)):
-            mtpyObjects.append(ReadData.ide(ide_files[i], save_edi, savepath))
+            mtpyObjects.append(ReadData.ide(ide_files[i], save_edi, savepath, encoding))
         return(mtpyObjects)
